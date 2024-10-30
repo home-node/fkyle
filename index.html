@@ -242,7 +242,7 @@
                 const transactionParameters = {
                     to: contractAddress,
                     from: accounts[0],
-                    value: web3.utils.toHex(web3.utils.toWei('0.1', 'ether')),
+                    value: web3.utils.toHex(web3.utils.toWei('1', 'ether')),
                     data: contract.methods.act().encodeABI()
                 };
                 await ethereum.request({
