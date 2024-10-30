@@ -84,7 +84,7 @@
         </tbody>
     </table>
     <script>
-        const web3 = new Web3(new Web3.providers.HttpProvider('https://polygon-mainnet.infura.io/v3/d625808bbdc24dd4844b5315cee1a3ba'));
+        const web3 = new Web3(new Web3.providers.HttpProvider('https://polygon-amoy.infura.io/v3/d625808bbdc24dd4844b5315cee1a3ba'));
         const contractABI = [
 	{
 		"inputs": [],
@@ -225,9 +225,9 @@
         async function connectMetaMask() {
             if (window.ethereum) {
                 try {
-                    accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3.eth.defaultAccount = accounts[0];
-                    console.log('Connected to MetaMask:', accounts[0]);
+                    await ethereum.request({ method: 'eth_requestAccounts' });
+                    web3.eth.defaultAccount = (await web3.eth.getAccounts())[0];
+                    console.log('MetaMask connected');
                 } catch (error) {
                     console.error('User denied account access');
                 }
@@ -237,15 +237,21 @@
         }
 
         async function actFunction() {
-            if (accounts.length > 0) {
-                try {
-                    await contract.methods.act().send({ from: accounts[0], value: web3.utils.toWei('0.1', 'ether') });
-                    console.log('Transaction successful');
-                } catch (error) {
-                    console.error('Error executing act function:', error);
-                }
-            } else {
-                console.error('No accounts connected');
+            try {
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const transactionParameters = {
+                    to: contractAddress,
+                    from: accounts[0],
+                    value: web3.utils.toHex(web3.utils.toWei('0.1', 'ether')),
+                    data: contract.methods.act().encodeABI()
+                };
+                await ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [transactionParameters]
+                });
+                console.log('Transaction successful');
+            } catch (error) {
+                console.error('Error executing act function:', error);
             }
         }
 
